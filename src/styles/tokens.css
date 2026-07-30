@@ -1,0 +1,111 @@
+/* ─────────────────────────────────────────────────────────────
+   Design tokens — see PLAN.md §3 (Brand) and §8 (Motion system).
+
+   The accent is measured, not chosen by taste: every shipped
+   project was screenshotted and hue-sampled. 150° (egesha),
+   195° (Ndai/Fomless), 210° (DAMA), 15–45° (Advance/Cheko/
+   StudioOS), 330°/360° were all occupied. 233° was the gap.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── canvas ──
+     Blue-tinted ink, NOT neutral black: most of the client work sits on
+     near-neutral black, so the blue shift makes this site its own world. */
+  --bg: #070a12;
+  --bg-1: #0b0f1a;
+  --bg-2: #111624;
+  --bg-3: #171d2e;
+
+  /* ── ink ── */
+  --text: #edeff7;
+  --text-2: #a3abc2;
+  --text-3: #6b7391;
+
+  /* ── accent (233° — the one unclaimed hue) ── */
+  --accent: #5a6cff;        /* 4.73:1 on --bg — AA for text */
+  --accent-bright: #7c9cff; /* 7.59:1 — small text, high contrast */
+  --accent-deep: #4361ff;   /* 4.14:1 — LARGE/fills/glows only, never body text */
+  --accent-ink: #ffffff;    /* on top of accent fills */
+
+  --accent-a08: rgba(90, 108, 255, 0.08);
+  --accent-a16: rgba(90, 108, 255, 0.16);
+  --accent-a32: rgba(90, 108, 255, 0.32);
+
+  --grad-accent: linear-gradient(135deg, var(--accent-bright), var(--accent-deep));
+
+  /* ── lines & glass ── */
+  --line: rgba(255, 255, 255, 0.08);
+  --line-2: rgba(255, 255, 255, 0.14);
+  --glass: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+  --glass-solid: rgba(17, 22, 36, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --card-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.7);
+
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent-bright);
+
+  /* ── type ── */
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Bricolage Grotesque', var(--font);
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 16px;
+  --fs-lg: 18px;
+  --fs-xl: 21px;
+  --fs-2xl: 28px;
+  --fs-3xl: 38px;
+  --fs-4xl: 52px;
+  --fs-5xl: 72px;
+  --fs-6xl: 104px;
+
+  /* ── space (8px base) ── */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 40px;
+  --sp-8: 56px;
+  --sp-9: 72px;
+  --sp-10: 96px;
+  --sp-11: 128px;
+
+  --maxw: 1240px;
+
+  /* ── radius ── */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-xl: 32px;
+  --r-full: 999px;
+
+  /* ── motion (PLAN §8: one easing vocabulary, everything composes from it) ── */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1); /* expressive entrance */
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  --d-micro: 180ms;
+  --d-el: 420ms;
+  --d-section: 700ms;
+  --d-hero: 1000ms; /* the hero earns this. almost nothing else does. */
+}
+
+/* Reduced motion is a first-class path, not a fallback (PLAN §8).
+   A frontend engineer's portfolio that ignores this is self-refuting. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --d-micro: 0.01ms;
+    --d-el: 0.01ms;
+    --d-section: 0.01ms;
+    --d-hero: 0.01ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

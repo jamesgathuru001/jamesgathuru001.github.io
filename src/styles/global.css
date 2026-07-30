@@ -1,0 +1,373 @@
+@import './fonts.css';
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+img {
+  display: block;
+  max-width: 100%;
+}
+ul {
+  list-style: none;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* No border-radius here: setting one globally overrode each component's own
+   radius the moment it took focus, so pill buttons visibly squared off. The
+   ring follows whatever shape the element already has. */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: var(--r-full);
+  border: 3px solid var(--bg);
+}
+
+/* ── layout helpers ── */
+.container {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section {
+  position: relative;
+  padding: var(--sp-10) 0;
+  /* Anchor targets must clear the fixed nav, or #work lands with its heading
+     tucked underneath it. */
+  scroll-margin-top: var(--sp-9);
+}
+@media (max-width: 640px) {
+  .section {
+    padding: var(--sp-9) 0;
+  }
+}
+
+/* ── chapters ──
+   Every section used to be transparent over one flat --bg, so the page read as
+   a single uninterrupted 6,500px slab with no structure. Alternating a raised
+   surface gives it chapter breaks without introducing another colour.
+
+   The seams are drawn as pseudo-elements rather than borders so they can fade
+   at the edges — a hard 100%-width hairline across a dark page reads as a
+   table rule, not as a fold. */
+.section--raised {
+  background: var(--bg-1);
+}
+.section--raised::before,
+.section--raised::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line-2) 22%, var(--line-2) 78%, transparent);
+  pointer-events: none;
+}
+.section--raised::before {
+  top: 0;
+}
+.section--raised::after {
+  bottom: 0;
+}
+
+/* Weight by importance rather than giving all nine sections identical air. */
+.section--major {
+  padding: var(--sp-11) 0;
+}
+.section--tight {
+  padding: var(--sp-9) 0;
+}
+@media (max-width: 640px) {
+  .section--major,
+  .section--tight {
+    padding: var(--sp-9) 0;
+  }
+}
+
+/* Monospace metadata label — `// 2026 — FINTECH` (PLAN §3 motifs) */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-bright);
+}
+.eyebrow::before {
+  content: '';
+  width: 22px;
+  height: 1px;
+  background: var(--accent);
+  opacity: 0.8;
+}
+/* Section index. order:-1 puts it ahead of the ::before rule, giving
+   [01] —— SELECTED WORK — the numbering reads as a table of contents rather
+   than nine identically-opened sections. */
+.eyebrow__idx {
+  order: -1;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 5vw, var(--fs-4xl));
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  margin-top: var(--sp-3);
+  text-wrap: balance;
+}
+
+.section-sub {
+  margin-top: var(--sp-4);
+  color: var(--text-2);
+  font-size: var(--fs-lg);
+  max-width: 60ch;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* ── per-project accent scope ──
+   Every project carries an `accentHue` sampled from the product itself. The
+   screenshots were already carrying that colour while the UI around them stayed
+   233° blue, quietly disagreeing with all nine.
+
+   The derived tokens are declared HERE, on the same element that receives
+   `--p-hue`, not on :root. Custom properties substitute var() at computed-value
+   time on the element they're declared on — put these in :root and every
+   descendant inherits the already-resolved 233° value, and the inline override
+   does nothing. Lightness/saturation are fixed so only the hue moves, which
+   keeps contrast predictable across all nine. */
+.accent-scope {
+  --p-hue: 233;
+  --p-bright: hsl(var(--p-hue) 92% 74%);
+  --p-mid: hsl(var(--p-hue) 88% 66%);
+  --p-a08: hsl(var(--p-hue) 88% 62% / 0.08);
+  --p-a16: hsl(var(--p-hue) 88% 62% / 0.16);
+  --p-a32: hsl(var(--p-hue) 88% 62% / 0.32);
+  --p-glow: hsl(var(--p-hue) 88% 55% / 0.35);
+}
+.accent-scope .eyebrow {
+  color: var(--p-bright);
+}
+.accent-scope .eyebrow::before {
+  background: var(--p-mid);
+}
+.accent-scope .pcard__role,
+.accent-scope .wcard__role {
+  border-left-color: var(--p-mid);
+  background: var(--p-a08);
+}
+.accent-scope .pcard__role-key {
+  color: var(--p-bright);
+}
+.accent-scope .pcard__live {
+  color: var(--p-bright);
+}
+
+.glass {
+  background: var(--glass), var(--glass-solid);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-inset), var(--card-shadow);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+}
+
+/* ── grain + vignette (PLAN §3 motifs) ── */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: var(--sp-4);
+  z-index: 10000;
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-radius: var(--r-sm);
+  font-weight: 600;
+  transition: top var(--d-micro) var(--ease);
+}
+.skip-link:focus {
+  top: var(--sp-4);
+}
+
+.magnetic {
+  display: inline-flex;
+  transition: transform var(--d-el) var(--ease);
+  will-change: transform;
+}
+
+/* ── buttons ──
+   Both variants share one silhouette so they read as a pair: same height, same
+   radius, same optical padding. Only the surface differs. */
+.btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: 52px;
+  padding: 0 var(--sp-6);
+  border: 1px solid transparent;
+  border-radius: var(--r-full);
+  font-weight: 600;
+  font-size: var(--fs-base);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  transition:
+    transform var(--d-micro) var(--ease),
+    box-shadow var(--d-el) var(--ease),
+    background var(--d-micro) var(--ease),
+    border-color var(--d-micro) var(--ease),
+    color var(--d-micro) var(--ease);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn--primary {
+  /* Vertical gradient + a 1px top highlight: the cue that reads as a lit
+     physical surface rather than a flat swatch. */
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent-deep));
+  color: var(--accent-ink);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 10px 24px -10px rgba(67, 97, 255, 0.75);
+}
+.btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.36),
+    0 16px 34px -12px rgba(67, 97, 255, 0.9);
+}
+.btn--primary:active {
+  transform: translateY(0);
+}
+/* Sheen sweep on hover. Sits above the fill; alpha kept low so it reads as
+   light crossing the surface rather than a white bar over the label. */
+.btn--primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 22%, rgba(255, 255, 255, 0.18) 46%, transparent 68%);
+  transform: translateX(-130%);
+  transition: transform 720ms var(--ease);
+}
+.btn--primary:hover::after {
+  transform: translateX(130%);
+}
+
+.btn--ghost {
+  /* Glass, not a bare outline — an accent-coloured border on hover was reading
+     as a stuck focus ring next to the filled button. */
+  background: var(--glass), rgba(255, 255, 255, 0.02);
+  border-color: var(--line-2);
+  color: var(--text);
+  box-shadow: var(--glass-inset);
+}
+.btn--ghost:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-a32);
+  background: var(--glass), var(--accent-a08);
+  box-shadow:
+    var(--glass-inset),
+    0 12px 28px -14px rgba(0, 0, 0, 0.8);
+}
+.btn--ghost:active {
+  transform: translateY(0);
+}
+
+/* Link underline sweep (PLAN §8 micro-interactions) */
+.link-sweep {
+  position: relative;
+  display: inline-block;
+}
+.link-sweep::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--d-el) var(--ease);
+}
+.link-sweep:hover::after,
+.link-sweep:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}

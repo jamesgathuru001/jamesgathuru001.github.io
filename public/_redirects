@@ -1,0 +1,4 @@
+# SPA fallback (Netlify).
+# /work is a client-side route — without this a direct hit or a refresh on it
+# returns the host's 404 instead of the app.
+/*  /index.html  200

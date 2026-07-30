@@ -1,0 +1,34 @@
+.pfield {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* the field owns the pointer so particles react anywhere in the hero */
+  touch-action: pan-y;
+}
+
+.pfield__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+/* Poster frame: first paint, and the entire effect when canvas is unavailable
+   or prefers-reduced-motion strips the loop. Reads as designed, not broken. */
+/* Centred on the mark (30% of hero height — see GLYPH_CY), so the glow sits
+   behind the glyph rather than behind the headline. */
+.pfield__fallback {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(46% 34% at 50% 30%, var(--accent-a16), transparent 70%),
+    radial-gradient(30% 24% at 62% 38%, rgba(67, 97, 255, 0.1), transparent 70%);
+}
+
+/* Vignette so the field falls off into the canvas rather than ending at an edge */
+.pfield::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(80% 70% at 50% 34%, transparent 45%, var(--bg) 100%);
+}

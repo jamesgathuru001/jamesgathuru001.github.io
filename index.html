@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#070a12" />
+
+    <title>James Gathuru — Frontend Engineer (React)</title>
+    <meta
+      name="description"
+      content="James Gathuru is a frontend engineer in Nairobi specializing in React. Frontend lead on production platforms across fintech, mobility and community."
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="James Gathuru — Frontend Engineer (React)" />
+    <meta
+      property="og:description"
+      content="Frontend engineer in Nairobi specializing in React. I build interfaces that feel inevitable."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Self-hosted (PLAN §9) — regenerate with `npm run fonts`. No third-party
+         connection on the critical path. The two families that render above the
+         fold are preloaded so text paints without a round trip after CSS. -->
+    <link
+      rel="preload"
+      href="/fonts/bricolage-grotesque-400-800-latin.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="preload" href="/fonts/inter-300-700-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "James Gathuru",
+        "jobTitle": "Frontend Engineer",
+        "email": "jamesgathuru001@gmail.com",
+        "url": "https://jamesgathuru.dev",
+        "sameAs": ["https://www.linkedin.com/in/james-gathuru/"],
+        "address": { "@type": "PostalAddress", "addressLocality": "Nairobi", "addressCountry": "KE" },
+        "knowsAbout": ["React", "TypeScript", "Frontend Engineering", "Web Animation"]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

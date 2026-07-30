@@ -1,0 +1,229 @@
+/* ─────────────────────────────────────────────────────────────
+   /work — the full project index.
+
+   Deliberately NOT the landing page's .pcard layout: that block is a
+   full-width alternating two-column case study, and nine of them would be
+   ~7000px of scroll. This is a scannable two-up grid.
+   ───────────────────────────────────────────────────────────── */
+
+.workpage__head {
+  position: relative;
+  padding-top: calc(var(--sp-11) + var(--sp-6));
+  padding-bottom: var(--sp-8);
+  background: radial-gradient(80% 100% at 50% 0%, var(--accent-a08), transparent 70%);
+}
+.workpage__back {
+  /* flex (block-level), NOT inline-flex: the .eyebrow that follows is itself
+     inline-flex, so an inline back link put them on the same line and the
+     eyebrow's leading rule struck through "BACK TO HOME". */
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 32px;
+  margin-bottom: var(--sp-6);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.workpage__back:hover {
+  color: var(--text);
+}
+.workpage__title {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 6vw, var(--fs-5xl));
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin-top: var(--sp-3);
+  text-wrap: balance;
+}
+.workpage__list {
+  padding-top: var(--sp-7);
+}
+
+.wgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-6);
+}
+@media (max-width: 860px) {
+  .wgrid {
+    grid-template-columns: 1fr;
+  }
+}
+/* Reveal wraps each card in a div; without this the card can't stretch to the
+   row height and the grid goes ragged. */
+.wgrid > * {
+  height: 100%;
+}
+
+.wcard {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  transition:
+    transform var(--d-el) var(--ease),
+    border-color var(--d-el) var(--ease);
+}
+.wcard:hover {
+  transform: translateY(-4px);
+  border-color: var(--p-a32);
+  box-shadow:
+    var(--glass-inset),
+    var(--card-shadow),
+    0 24px 60px -30px var(--p-glow);
+}
+.wcard:hover .wcard__media {
+  border-bottom-color: var(--p-a32);
+}
+.wcard:hover .pcard__tech li {
+  border-color: var(--p-a16);
+}
+.wcard__media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-1);
+}
+.wcard__media .pcard__shot {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform var(--d-section) var(--ease);
+}
+.wcard:hover .pcard__shot {
+  transform: scale(1.03);
+}
+
+.wcard__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: var(--sp-6);
+}
+.wcard__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  margin-top: var(--sp-3);
+}
+.wcard__sub {
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  margin-top: var(--sp-1);
+}
+.wcard__role {
+  margin-top: var(--sp-4);
+  font-size: var(--fs-sm);
+}
+.wcard__summary {
+  margin-top: var(--sp-4);
+  color: var(--text-2);
+  font-size: var(--fs-sm);
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+.wcard__private {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  line-height: 1.5;
+  color: var(--text-3);
+}
+.wcard__private svg {
+  flex: none;
+}
+.wcard__tech {
+  margin-top: var(--sp-4);
+}
+/* Pins the links to the bottom so a row of cards with unequal copy still lines
+   its CTAs up. */
+.wcard__links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: var(--sp-5);
+}
+.wcard__live {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 44px;
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+}
+.wcard__live:hover {
+  color: var(--text);
+}
+.wcard__title-link::after {
+  /* Stretches the title link over the whole card so the entire tile is the
+     click target, while the "Live site" anchor above it stays separately
+     clickable via its own stacking context. */
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.wcard {
+  position: relative;
+}
+.wcard__links,
+.wcard__media {
+  position: relative;
+  z-index: 2;
+}
+
+.workpage__cta {
+  text-align: center;
+  border-top: 1px solid var(--line);
+  background: radial-gradient(70% 100% at 50% 0%, var(--accent-a08), transparent 70%);
+}
+
+/* ── landing-page link out to this page ── */
+.work__more {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--sp-9);
+}
+.work__more-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  min-height: 52px;
+  padding: 0 var(--sp-6);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-full);
+  font-weight: 600;
+  transition:
+    border-color var(--d-micro) var(--ease),
+    background var(--d-micro) var(--ease),
+    transform var(--d-micro) var(--ease);
+}
+.work__more-link:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-a32);
+  background: var(--accent-a08);
+}
+.work__more-count {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--accent-bright);
+}

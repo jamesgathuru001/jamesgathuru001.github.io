@@ -1,0 +1,264 @@
+/* ─────────────────────────────────────────────────────────────
+   /work/:slug — the case study.
+
+   Exists to render what the inventory already carried and nothing showed:
+   `contribution[]`, `scope`, and the -full page captures that `npm run assets`
+   has been optimizing all along.
+   ───────────────────────────────────────────────────────────── */
+
+.cs__head {
+  position: relative;
+  padding-top: calc(var(--sp-11) + var(--sp-6));
+  padding-bottom: var(--sp-7);
+  background: radial-gradient(80% 100% at 50% 0%, var(--p-a16), transparent 70%);
+}
+.cs__title {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 7vw, var(--fs-5xl));
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  margin-top: var(--sp-3);
+}
+.cs__sub {
+  margin-top: var(--sp-2);
+  color: var(--text-2);
+  font-size: var(--fs-xl);
+}
+
+.cs__facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-5);
+  margin-top: var(--sp-8);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--line);
+}
+@media (max-width: 720px) {
+  .cs__facts {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-4);
+  }
+}
+.cs__facts dt {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.cs__facts dd {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-sm);
+  color: var(--text);
+  text-wrap: pretty;
+}
+
+.cs__hero {
+  position: relative;
+  margin-top: var(--sp-6);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--card-shadow);
+  background: var(--bg-1);
+  aspect-ratio: 16 / 10;
+}
+.cs__hero .pcard__shot {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.cs__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: var(--sp-9);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .cs__grid {
+    grid-template-columns: 1fr;
+    gap: var(--sp-7);
+  }
+}
+.cs__h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-top: var(--sp-8);
+}
+.cs__main > :first-child .cs__h2 {
+  margin-top: 0;
+}
+.cs__lead {
+  margin-top: var(--sp-4);
+  color: var(--text-2);
+  font-size: var(--fs-lg);
+  line-height: 1.7;
+  max-width: 62ch;
+  text-wrap: pretty;
+}
+.cs__contrib {
+  margin-top: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  max-width: 62ch;
+}
+.cs__contrib li {
+  position: relative;
+  padding-left: var(--sp-6);
+  color: var(--text-2);
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+.cs__contrib li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 12px;
+  height: 1px;
+  background: var(--p-mid);
+}
+.cs__private {
+  margin-top: var(--sp-6);
+  align-items: flex-start;
+  max-width: 62ch;
+}
+
+/* ── aside ── */
+.cs__aside {
+  position: sticky;
+  top: calc(var(--sp-9) + var(--sp-4));
+}
+@media (max-width: 900px) {
+  .cs__aside {
+    position: static;
+  }
+}
+.cs__scope {
+  padding: var(--sp-4) var(--sp-5);
+  border-left: 2px solid var(--p-mid);
+  background: var(--p-a08);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+}
+.cs__scope-key {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--p-bright);
+}
+.cs__scope-val {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--text);
+  text-wrap: pretty;
+}
+.cs__aside-key {
+  margin-top: var(--sp-7);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.cs__tech {
+  margin-top: var(--sp-3);
+}
+.cs__visit {
+  margin-top: var(--sp-6);
+  width: 100%;
+}
+.cs__offline {
+  margin-top: var(--sp-6);
+}
+
+/* ── the long shot ──
+   Capped and scrollable: these captures run to ~20,000px tall, and dropping one
+   inline would bury the rest of the page under a single image. */
+.cs__long-key {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: var(--sp-4);
+}
+.cs__long-frame {
+  max-height: 620px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line);
+  box-shadow: var(--card-shadow);
+  background: var(--bg-1);
+}
+.cs__long-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── next ── */
+.cs__next {
+  border-top: 1px solid var(--line);
+}
+.cs__next-link {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  transition:
+    transform var(--d-micro) var(--ease),
+    border-color var(--d-micro) var(--ease),
+    background var(--d-micro) var(--ease);
+}
+.cs__next-link:hover {
+  transform: translateY(-2px);
+  border-color: var(--p-a32);
+  background: var(--p-a08);
+}
+.cs__next-key {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.cs__next-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  margin-left: auto;
+}
+.cs__next-link svg {
+  color: var(--p-bright);
+  transition: transform var(--d-micro) var(--ease);
+}
+.cs__next-link:hover svg {
+  transform: translateX(4px);
+}
+@media (max-width: 560px) {
+  .cs__next-link {
+    flex-wrap: wrap;
+  }
+  .cs__next-title {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+.cs__cta {
+  text-align: center;
+  border-top: 1px solid var(--line);
+  background: radial-gradient(70% 100% at 50% 0%, var(--p-a08), transparent 70%);
+}
