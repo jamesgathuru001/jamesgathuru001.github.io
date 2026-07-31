@@ -39,7 +39,6 @@
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .nav.is-solid {
     backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
   }
 }
 .nav__inner {
@@ -141,7 +140,6 @@
   @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .nav__sheet {
       backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
     }
   }
 }

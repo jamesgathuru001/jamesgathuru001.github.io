@@ -31,7 +31,6 @@
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .modal__scrim {
     backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
   }
 }
 .modal__panel {

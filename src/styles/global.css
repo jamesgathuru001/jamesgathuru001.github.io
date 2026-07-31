@@ -229,7 +229,6 @@ ul {
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .glass {
     backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
   }
 }
 
