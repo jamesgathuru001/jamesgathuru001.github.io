@@ -24,12 +24,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # No `cache: npm`. A partially-restored ~/.npm cache is a well-known way
+      # to make `npm ci` fail with integrity errors, and it only saves ~20s on
+      # an install this size. Correctness over the cache.
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: npm
+          node-version: 24
 
-      - run: npm ci
+      - name: Environment
+        run: |
+          echo "node    $(node -v)"
+          echo "npm     $(npm -v)"
+          echo "runner  $(uname -srm)"
+          echo "lockfileVersion $(node -p "require('./package-lock.json').lockfileVersion")"
+
+      # --foreground-scripts surfaces native install output (sharp, rolldown,
+      # lightningcss) instead of swallowing it, so a failure here is readable.
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund --foreground-scripts
 
       - name: Lint
         run: npm run lint
