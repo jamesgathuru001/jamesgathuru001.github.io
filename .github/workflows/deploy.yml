@@ -22,12 +22,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # v5 runs natively on Node 24; v4 targets Node 20 and the runner now
+      # force-upgrades it with a deprecation warning.
+      - uses: actions/checkout@v5
 
       # No `cache: npm`. A partially-restored ~/.npm cache is a well-known way
       # to make `npm ci` fail with integrity errors, and it only saves ~20s on
       # an install this size. Correctness over the cache.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
 
@@ -38,10 +40,29 @@ jobs:
           echo "runner  $(uname -srm)"
           echo "lockfileVersion $(node -p "require('./package-lock.json').lockfileVersion")"
 
-      # --foreground-scripts surfaces native install output (sharp, rolldown,
-      # lightningcss) instead of swallowing it, so a failure here is readable.
+      # npm's real error lives in the step log, which is not readable without a
+      # token — so on failure we re-emit it as ::error:: annotations, which show
+      # up in the run summary. `npm ci` always names its cause (EINTEGRITY,
+      # ETARGET, EBADPLATFORM, EUSAGE...), and that one line is the whole
+      # diagnosis.
       - name: Install dependencies
-        run: npm ci --no-audit --no-fund --foreground-scripts
+        run: |
+          set -o pipefail
+          if ! npm ci --no-audit --no-fund --foreground-scripts 2>&1 | tee /tmp/npm-ci.log; then
+            echo "::group::npm ci output (tail)"
+            tail -n 80 /tmp/npm-ci.log
+            echo "::endgroup::"
+            grep -aE 'npm (error|ERR!|warn EBADENGINE)' /tmp/npm-ci.log \
+              | tail -n 25 \
+              | while IFS= read -r line; do echo "::error::${line}"; done
+            for f in "$HOME"/.npm/_logs/*-debug-0.log; do
+              [ -f "$f" ] || continue
+              echo "::group::npm debug log"
+              tail -n 60 "$f"
+              echo "::endgroup::"
+            done
+            exit 1
+          fi
 
       - name: Lint
         run: npm run lint
