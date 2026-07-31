@@ -744,94 +744,309 @@
   text-wrap: pretty;
 }
 
-/* ── primary email row ──
-   The address is a real mailto link and a copy button, side by side. Copying an
-   address is the thing people actually do with it, and making them select it by
-   hand is exactly the last-5% neglect this site argues against. */
-.cmail {
+/* ── contact CTA (landing, /work, case studies) ──
+   These pages close by pointing at /contact rather than each carrying a copy of
+   the form. */
+.contact__cta {
   display: flex;
-  align-items: stretch;
-  gap: var(--sp-3);
-  max-width: 560px;
-  margin: var(--sp-8) auto 0;
-  text-align: left;
+  justify-content: center;
+  margin-top: var(--sp-8);
 }
-.cmail__link {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
-  padding: var(--sp-4) var(--sp-5);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--r-lg);
-  background: var(--glass), var(--glass-solid);
-  box-shadow: var(--glass-inset);
-  transition:
-    transform var(--d-micro) var(--ease),
-    border-color var(--d-micro) var(--ease),
-    background var(--d-micro) var(--ease);
-}
-.cmail__link:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent-a32);
-  background: var(--glass), var(--accent-a08);
-}
-.cmail__icon {
-  flex: none;
+
+/* ── contact layout ──
+   Lives inside .contact, which centres its heading. The body below it is set
+   left: a form whose labels are centred is unreadable. */
+.cgrid {
   display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: var(--r-md);
-  background: var(--accent-a16);
+  text-align: left;
+  grid-template-columns: minmax(0, 330px) minmax(0, 1fr);
+  gap: var(--sp-6);
+  align-items: start;
+  margin-top: var(--sp-9);
+}
+@media (max-width: 980px) {
+  .cgrid {
+    grid-template-columns: 1fr;
+    gap: var(--sp-5);
+  }
+}
+
+/* ── aside: what you want to know before writing ── */
+.caside {
+  display: grid;
+  gap: var(--sp-4);
+}
+@media (min-width: 981px) {
+  .caside {
+    /* Follows the form down. The message box is the tall element on this page,
+       and the reply time is worth keeping in view while you fill it in. */
+    position: sticky;
+    top: 104px;
+  }
+}
+
+.cfacts {
+  display: grid;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+.cfacts li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: var(--sp-3);
+  row-gap: 2px;
+}
+.cfacts svg {
+  grid-row: span 2;
   color: var(--accent-bright);
 }
-.cmail__text {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.cmail__label {
+.cfacts__label {
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-3);
 }
-.cmail__value {
-  font-size: var(--fs-lg);
-  font-weight: 600;
+.cfacts__value {
+  font-size: var(--fs-sm);
+  font-weight: 500;
   color: var(--text);
-  /* Long addresses must not push the arrow off the card. */
+}
+/* Doubled class, not a bare modifier: `.ccards` is declared further down the
+   file, so at equal specificity it would win on source order and the aside
+   would stay two-up — which truncates both values at this column width. */
+.ccards.ccards--stack {
+  grid-template-columns: 1fr;
+}
+
+/* ── the form panel ── */
+.cpanel {
+  position: relative;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  padding: var(--sp-7);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-xl);
+  background: var(--glass), var(--glass-solid);
+  box-shadow: var(--glass-inset), var(--card-shadow);
 }
-.cmail__go {
-  flex: none;
-  margin-left: auto;
+@supports (backdrop-filter: blur(1px)) {
+  .cpanel {
+    backdrop-filter: blur(14px);
+  }
+}
+/* A lit top edge. The same cue the primary button uses, so the panel reads as
+   part of the same material rather than a plain box. */
+.cpanel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-a32), transparent);
+}
+@media (max-width: 560px) {
+  .cpanel {
+    padding: var(--sp-5);
+  }
+}
+
+/* ── contact form ── */
+.cform {
+  display: grid;
+  gap: var(--sp-5);
+  text-align: left;
+}
+.cform__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+}
+.cform__field {
+  display: grid;
+  gap: var(--sp-2);
+  margin: 0;
+  min-width: 0;
+}
+.cform__field label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--text-3);
-  transition: transform var(--d-micro) var(--ease), color var(--d-micro) var(--ease);
 }
-.cmail__link:hover .cmail__go {
-  transform: translate(2px, -2px);
+.cform__req {
+  margin-left: 3px;
   color: var(--accent-bright);
 }
-.cmail__copy {
-  flex: none;
+.cform__field input,
+.cform__field textarea {
+  width: 100%;
+  /* 48px clears the 44px touch minimum without a min-height override. */
+  padding: var(--sp-3) var(--sp-4);
+  min-height: 48px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-md);
+  background: rgba(7, 10, 18, 0.55);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--fs-base);
+  transition:
+    border-color var(--d-micro) var(--ease),
+    box-shadow var(--d-micro) var(--ease),
+    background var(--d-micro) var(--ease);
+}
+.cform__field ::placeholder {
+  color: var(--text-3);
+}
+.cform__field textarea {
+  /* Horizontal drag would break the column; vertical is the one people want. */
+  resize: vertical;
+  min-height: 148px;
+  line-height: 1.6;
+}
+.cform__field input:hover,
+.cform__field textarea:hover {
+  border-color: var(--glass-border);
+  background: rgba(7, 10, 18, 0.7);
+}
+/* Overrides the global focus ring: that one is built for elements sitting on
+   the page background, and its 2px --bg gap cut a dark trench through the
+   panel. Same job, tuned to this surface — accent edge plus a soft halo. */
+.cform__field input:focus-visible,
+.cform__field textarea:focus-visible {
+  outline: none;
+  border-color: var(--accent-bright);
+  background: rgba(7, 10, 18, 0.8);
+  box-shadow: 0 0 0 3px var(--accent-a32);
+}
+.cform__field input[aria-invalid='true'],
+.cform__field textarea[aria-invalid='true'] {
+  border-color: #ff8080;
+}
+
+.cform__err,
+.cform__hint {
+  font-size: var(--fs-xs);
+  line-height: 1.45;
+  min-height: 1.45em;
+}
+/* Not colour alone: the message itself carries the meaning, so the red is
+   reinforcement rather than the signal. */
+.cform__err {
+  color: #ff9b9b;
+}
+.cform__hint {
+  color: var(--text-3);
+}
+
+/* Off-screen rather than display:none — plenty of bots skip what the page
+   itself hides, which would defeat the point of the trap. */
+.cform__honey {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.cform__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+.cform__sendlabel {
+  display: grid;
+  place-items: center;
+}
+/* Both labels share one cell, so the box takes the width of the widest. */
+.cform__sendlabel > * {
+  grid-area: 1 / 1;
+}
+.cform__sendsizer {
+  visibility: hidden;
+}
+.cform__send[disabled] {
+  opacity: 0.7;
+  cursor: progress;
+}
+.cform__spinner {
+  /* Exactly the Send icon's 16px. At 15px the button lost a pixel the moment it
+     started sending — invisible, but the no-shift test is the thing that keeps
+     this button honest, so it matches. */
+  width: 16px;
+  height: 16px;
+  border-radius: var(--r-full);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: var(--accent-ink);
+  animation: cspin 640ms linear infinite;
+}
+@keyframes cspin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+.cform__status {
+  flex: 1 1 200px;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: var(--text-2);
+  text-wrap: pretty;
+}
+.cform__status.is-error {
+  color: #ff9b9b;
+}
+.cform__status a {
+  color: var(--accent-bright);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── sent ──
+   Replaces the form. An emptied form under a success line reads as though the
+   send failed and wiped the message. */
+.cform__done {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-6) var(--sp-4);
+  text-align: center;
+}
+.cform__donemark {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--accent-a32);
+  background: var(--accent-a16);
+  color: var(--accent-bright);
+}
+.cform__donetitle {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.cform__donetext {
+  max-width: 40ch;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+.cform__again {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: var(--sp-2);
-  /* Fixed width: "Copied" is wider than "Copy", and letting the button resize
-     on click shoved the email card — a visible jump at the exact moment the
-     user is looking for confirmation. */
-  min-width: 104px;
-  padding: 0 var(--sp-4);
+  min-height: 44px;
+  margin-top: var(--sp-2);
+  padding: 0 var(--sp-5);
   border: 1px solid var(--line-2);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-full);
   font-family: var(--font-mono);
   font-size: var(--fs-xs);
   color: var(--text-2);
@@ -840,26 +1055,57 @@
     border-color var(--d-micro) var(--ease),
     background var(--d-micro) var(--ease);
 }
-.cmail__copy:hover {
+.cform__again:hover {
   color: var(--text);
   border-color: var(--accent-a32);
   background: var(--accent-a08);
 }
 
-/* ── secondary channels ── */
+.cform__fallback {
+  color: var(--text-2);
+  font-size: var(--fs-base);
+}
+.cform__fallback a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent-bright);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .cform__row {
+    grid-template-columns: 1fr;
+  }
+  .cform__send {
+    width: 100%;
+  }
+}
+
+/* ── footer contact ──
+   Phone and LinkedIn only. The address itself is deliberately not printed
+   anywhere — /contact takes messages to the same inbox through the form.
+   A modifier on .ccards, so the card styling stays in one place. */
+.fcontact {
+  max-width: 720px;
+  padding-bottom: var(--sp-7);
+  margin-bottom: var(--sp-7);
+  border-bottom: 1px solid var(--line);
+}
+
 .ccards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--sp-3);
-  max-width: 560px;
-  margin: var(--sp-3) auto 0;
+  min-width: 0;
 }
 .ccard {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
   grid-template-areas:
-    'icon label go'
-    'icon value go';
+    'icon label'
+    'icon value';
   align-items: center;
   column-gap: var(--sp-3);
   padding: var(--sp-4);
@@ -905,31 +1151,16 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.ccard__go {
-  grid-area: go;
-  color: var(--text-3);
-  transition: transform var(--d-micro) var(--ease), color var(--d-micro) var(--ease);
-}
-.ccard:hover .ccard__go {
-  transform: translate(2px, -2px);
-  color: var(--accent-bright);
-}
-
-.contact__meta {
-  margin-top: var(--sp-7);
-  font-family: var(--font-mono);
-  font-size: var(--fs-xs);
-  color: var(--text-3);
+@media (max-width: 640px) {
+  .cform__row {
+    grid-template-columns: 1fr;
+  }
+  .cform__send {
+    width: 100%;
+  }
 }
 
 @media (max-width: 560px) {
-  .cmail {
-    flex-direction: column;
-  }
-  .cmail__copy {
-    justify-content: center;
-    min-height: 48px;
-  }
   .ccards {
     grid-template-columns: 1fr;
   }

@@ -3,7 +3,8 @@ import { Suspense, lazy, useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import Reveal from '../components/Reveal';
 import Modal from '../components/Modal';
-import ContactBlock from '../components/ContactBlock';
+import ContactPanel from '../components/ContactPanel';
+import ContactDetails from '../components/ContactDetails';
 import useLocalTime from '../hooks/useLocalTime';
 import { site } from '../data/site';
 import { stack, craft } from '../data/stack';
@@ -235,8 +236,11 @@ export function Contact() {
           </p>
         </Reveal>
 
+        {/* The form is here, on the landing page, rather than behind a link.
+            /work and the case studies close with a CTA pointing back at this
+            section, so there is still only one copy of it. */}
         <Reveal delay={0.08}>
-          <ContactBlock />
+          <ContactPanel />
         </Reveal>
       </div>
     </section>
@@ -248,14 +252,17 @@ export function Footer() {
   const time = useLocalTime();
   return (
     <footer className="footer">
-      <div className="container footer__inner">
-        <div>
-          <p className="footer__mark">{site.initials}</p>
-          <p className="footer__note">
-            {site.location} — {time}
-          </p>
+      <div className="container">
+        <ContactDetails />
+        <div className="footer__inner">
+          <div>
+            <p className="footer__mark">{site.initials}</p>
+            <p className="footer__note">
+              {site.location} — {time}
+            </p>
+          </div>
+          <p className="footer__copy">© {new Date().getFullYear()} {site.name}</p>
         </div>
-        <p className="footer__copy">© {new Date().getFullYear()} {site.name}</p>
       </div>
     </footer>
   );

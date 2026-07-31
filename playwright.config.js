@@ -21,6 +21,10 @@ export default defineConfig({
   webServer: {
     command: 'npm run build && npx vite preview --port 4173 --strictPort',
     url: 'http://localhost:4173',
+    // The contact form only renders once it has a key, so the build under test
+    // needs one. The tests intercept api.web3forms.com, so nothing is ever sent
+    // and the value never has to be real.
+    env: { VITE_WEB3FORMS_KEY: process.env.VITE_WEB3FORMS_KEY || 'test-access-key' },
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
   },

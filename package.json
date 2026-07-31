@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "shoot": "node scripts/shoot.mjs",
     "assets": "node scripts/optimize.mjs",
+    "icons": "node scripts/icons.mjs",
     "fonts": "node scripts/fonts.mjs",
     "test": "playwright test"
   },

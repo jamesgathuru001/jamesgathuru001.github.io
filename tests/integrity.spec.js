@@ -57,6 +57,10 @@ test.describe('page integrity', () => {
       const small = await page.evaluate(() =>
         [...document.querySelectorAll('a, button, input')]
           .filter((el) => el.offsetParent !== null)
+          // The contact form's honeypot is a real input that no person can
+          // reach — unfocusable and hidden from assistive tech. Sizing it to
+          // 24px would only make it easier for a bot to notice.
+          .filter((el) => el.tabIndex !== -1 && el.getAttribute('aria-hidden') !== 'true')
           .map((el) => ({
             label: (el.innerText || el.getAttribute('aria-label') || el.tagName).slice(0, 30),
             height: Math.round(el.getBoundingClientRect().height),

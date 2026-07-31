@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Real env values. `.env.example` documents the keys and stays checked in.
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

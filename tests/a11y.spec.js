@@ -100,33 +100,166 @@ test.describe('combobox', () => {
   });
 });
 
+const RELAY = 'https://api.web3forms.com/submit';
+
 test.describe('contact', () => {
-  test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
-
-  test('copies the real address and announces it', async ({ page }) => {
+  test('the nav Contact link scrolls to the form on the landing page', async ({ page }) => {
+    // Contact is a landing section, not a route: most visitors never leave the
+    // landing page, and a navigation between them and the form costs replies.
     await page.goto('/');
-    await page.locator('#contact').scrollIntoViewIfNeeded();
-    await page.locator('.cmail__copy').click();
-
-    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
-      'jamesgathuru001@gmail.com'
-    );
-    await expect(page.locator('#contact [role="status"]')).toHaveText(
-      'Email address copied to clipboard'
-    );
-    await expect(page.locator('.cmail__copy')).toHaveText('Copied');
+    await page.getByRole('navigation').getByRole('link', { name: 'Contact' }).click();
+    await expect(page).toHaveURL(/#contact$/);
+    await expect(page.locator('#contact .cform')).toBeInViewport();
   });
 
-  test('copying does not shift the layout', async ({ page }) => {
-    // Regression: "Copied" is wider than "Copy", so the button resized on click
-    // and shoved the email card at the exact moment you look for confirmation.
+  test('the closing CTA on /work reaches the form', async ({ page }) => {
+    await page.goto('/work');
+    await page.getByRole('link', { name: 'Start a conversation' }).click();
+    await expect(page).toHaveURL(/\/#contact$/);
+    await expect(page.locator('#contact .cform')).toBeVisible();
+  });
+
+  test('the footer carries phone and LinkedIn, and never a raw address', async ({ page }) => {
+    // The address is deliberately unprinted: the form reaches the same inbox,
+    // and a mailto in the DOM of every page is free food for scrapers.
+    for (const route of ['/', '/work']) {
+      await page.goto(route);
+      await expect(page.locator('footer a[href^="tel:"]')).toBeVisible();
+      await expect(page.locator('footer a[href*="linkedin.com"]')).toBeVisible();
+      await expect(page.locator('footer a[href^="mailto:"]')).toHaveCount(0);
+    }
+  });
+});
+
+test.describe('contact form', () => {
+  const ok = (page, delay = 0) =>
+    page.route(RELAY, async (route) => {
+      if (delay) await new Promise((r) => setTimeout(r, delay));
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true, message: 'Email sent successfully' }),
+      });
+    });
+
+  const fill = async (page) => {
     await page.goto('/');
     await page.locator('#contact').scrollIntoViewIfNeeded();
-    const width = async () => (await page.locator('.cmail__link').boundingBox()).width;
+    await page.getByLabel('Name').fill('Ada Lovelace');
+    await page.getByLabel('Email').fill('ada@example.com');
+    await page.getByLabel('What are you building?').fill('An analytical engine dashboard.');
+  };
 
-    const before = await width();
-    await page.locator('.cmail__copy').click();
-    await expect(page.locator('.cmail__copy')).toHaveText('Copied');
-    expect(await width()).toBe(before);
+  test('every field has an accessible name', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#contact').scrollIntoViewIfNeeded();
+    for (const label of ['Name', 'Email', 'What are you building?']) {
+      await expect(page.getByLabel(label)).toBeVisible();
+    }
+  });
+
+  test('the honeypot is hidden from people and from assistive tech', async ({ page }) => {
+    // A visible or focusable trap catches keyboard users instead of bots.
+    await page.goto('/');
+    await page.locator('#contact').scrollIntoViewIfNeeded();
+    const honey = page.locator('.cform__honey');
+    await expect(honey).toHaveAttribute('aria-hidden', 'true');
+    await expect(honey).toHaveAttribute('tabindex', '-1');
+    expect((await honey.boundingBox()).x).toBeLessThan(0);
+  });
+
+  test('validation waits for blur, then clears as soon as it is fixed', async ({ page }) => {
+    // Flagging an address as malformed while it is still being typed is
+    // technically correct and hostile.
+    await page.goto('/');
+    await page.locator('#contact').scrollIntoViewIfNeeded();
+    const email = page.getByLabel('Email');
+    await email.fill('ada@');
+    await expect(page.locator('#cf-email-err')).toHaveText('');
+
+    await email.blur();
+    await expect(page.locator('#cf-email-err')).toContainText('missing an @ or a domain');
+    await expect(email).toHaveAttribute('aria-invalid', 'true');
+
+    await email.fill('ada@example.com');
+    await expect(page.locator('#cf-email-err')).toHaveText('');
+  });
+
+  test('submitting empty focuses the first field that needs fixing', async ({ page }) => {
+    // The form can be taller than the viewport; leaving someone to hunt for the
+    // offending field is how a submit button starts feeling broken.
+    await page.goto('/');
+    await page.locator('#contact').scrollIntoViewIfNeeded();
+    await page.getByRole('button', { name: 'Send message' }).click();
+    await expect(page.getByLabel('Name')).toBeFocused();
+    await expect(page.locator('#cf-name-err')).toContainText('Tell me who you are');
+  });
+
+  test('a successful send replaces the form with a confirmation', async ({ page }) => {
+    // An emptied form under a success line reads as though the send failed and
+    // wiped the message.
+    await ok(page);
+    await fill(page);
+    await page.getByRole('button', { name: 'Send message' }).click();
+
+    await expect(page.locator('.cform__donetitle')).toHaveText('Message sent');
+    await expect(page.locator('.cform')).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Send another' }).click();
+    await expect(page.getByLabel('Name')).toHaveValue('');
+  });
+
+  test('the submission carries the message and the access key', async ({ page }) => {
+    let posted;
+    await page.route(RELAY, (route) => {
+      posted = route.request().postData();
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: true }),
+      });
+    });
+    await fill(page);
+    await page.getByRole('button', { name: 'Send message' }).click();
+    await expect(page.locator('.cform__donetitle')).toBeVisible();
+
+    expect(posted).toContain('ada@example.com');
+    expect(posted).toContain('analytical engine dashboard');
+    expect(posted).toContain('access_key');
+  });
+
+  test('a rejected send keeps the message and offers the address', async ({ page }) => {
+    // Losing what someone just typed because a relay was down is the one
+    // failure mode a contact form cannot have.
+    await page.route(RELAY, (route) =>
+      route.fulfill({
+        status: 400,
+        contentType: 'application/json',
+        body: JSON.stringify({ success: false, message: 'Invalid access key' }),
+      })
+    );
+    await fill(page);
+    await page.getByRole('button', { name: 'Send message' }).click();
+
+    await expect(page.locator('.cform__status.is-error')).toContainText('Invalid access key');
+    await expect(page.locator('.cform__status a')).toHaveAttribute(
+      'href',
+      'mailto:jamesgathuru001@gmail.com'
+    );
+    await expect(page.getByLabel('What are you building?')).toHaveValue(
+      'An analytical engine dashboard.'
+    );
+  });
+
+  test('submitting does not resize the button', async ({ page }) => {
+    // "Sending" is shorter than "Send message" — the same class of bug the Copy
+    // button had, with the status text sitting right beside it.
+    await ok(page, 900);
+    await fill(page);
+    const send = page.locator('.cform__send');
+    const before = (await send.boundingBox()).width;
+    await send.click();
+    await expect(send).toContainText('Sending');
+    expect((await send.boundingBox()).width).toBe(before);
   });
 });

@@ -69,8 +69,16 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # Not a secret, and deliberately not stored as one. Anything VITE_-prefixed
+      # is inlined into the client bundle at build time, so this value is public
+      # the moment the site ships — putting it in `secrets` would only disguise
+      # that and add a setup step that, if forgotten, silently downgrades the
+      # contact form to a mailto link. Web3Forms keys are meant to be public;
+      # what protects the inbox is the domain lock in their dashboard.
       - name: Build
         run: npm run build
+        env:
+          VITE_WEB3FORMS_KEY: 9185cb01-cef3-4eb0-b70d-818c6bda640b
 
       # The suite drives the real production build — routing, the focus trap,
       # the layered Escape, the accent contrast. A red build should not deploy.
@@ -87,6 +95,12 @@ jobs:
           test -f dist/404.html || { echo "::error::dist/404.html missing — /work would 404 on refresh"; exit 1; }
           test -f dist/CNAME   || { echo "::error::dist/CNAME missing — custom domain would be dropped"; exit 1; }
           echo "CNAME: $(cat dist/CNAME)"
+          # A missing key does not break the build — the form degrades to a
+          # mailto link. That is the right behaviour in a browser and the wrong
+          # thing to discover in production, so assert the relay actually made
+          # it into the bundle.
+          grep -rq "api.web3forms.com" dist/assets/*.js \
+            || { echo "::error::contact form relay missing from the bundle — VITE_WEB3FORMS_KEY did not reach the build"; exit 1; }
 
       - uses: actions/configure-pages@v5
 

@@ -5,7 +5,6 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, Lock } from 'lucide-react';
 import useLenis from '../hooks/useLenis';
 import ScrollProgress from '../components/ScrollProgress';
 import Reveal from '../components/Reveal';
-import ContactBlock from '../components/ContactBlock';
 import Shot from '../components/Shot';
 import Nav from '../sections/Nav';
 import { Footer } from '../sections/Sections';
@@ -91,7 +90,12 @@ export default function WorkPage() {
               </p>
             </Reveal>
             <Reveal delay={0.08}>
-              <ContactBlock />
+              <div className="contact__cta">
+                <a href="/#contact" className="btn btn--primary">
+                  Start a conversation
+                  <ArrowUpRight size={18} aria-hidden="true" />
+                </a>
+              </div>
             </Reveal>
           </div>
         </section>

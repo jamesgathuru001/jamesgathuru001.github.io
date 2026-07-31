@@ -118,7 +118,9 @@ export default function Nav() {
 
         <div className="nav__end">
           <Magnetic>
-            <a href={`mailto:${site.email}`} className="btn btn--primary nav__cta">
+            {/* Was a mailto:. A form the visitor can fill in on the spot beats
+                handing their mail client a blank compose window. */}
+            <a href={href('#contact')} className="btn btn--primary nav__cta">
               Hire me
             </a>
           </Magnetic>
@@ -164,7 +166,7 @@ export default function Nav() {
               ))}
             </ul>
             <a
-              href={`mailto:${site.email}`}
+              href={href('#contact')}
               className="btn btn--primary nav__sheet-cta"
               onClick={() => setOpen(false)}
             >

@@ -33,4 +33,5 @@ export const nav = [
   { label: 'Craft', href: '#craft' },
   { label: 'Stack', href: '#stack' },
   { label: 'About', href: '#about' },
+  { label: 'Contact', href: '#contact' },
 ];

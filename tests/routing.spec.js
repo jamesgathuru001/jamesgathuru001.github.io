@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { nav } from '../src/data/site.js';
 
 test.describe('navigation', () => {
   test('"See all work" lands at the top of /work', async ({ page }) => {
@@ -87,7 +88,9 @@ test.describe('mobile', () => {
 
     await page.locator('.nav__burger').tap();
     await expect(page.locator('.nav__sheet')).toBeVisible();
-    await expect(page.locator('.nav__sheet-links a')).toHaveCount(4);
+    // Counted from the nav data, not hardcoded — the sheet is the only
+    // navigation at this width, so a new entry that misses it is a real bug.
+    await expect(page.locator('.nav__sheet-links a')).toHaveCount(nav.length);
     expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe(
       'hidden'
     );
