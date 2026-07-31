@@ -33,8 +33,31 @@ Two details that are load-bearing:
   a refresh. `public/_redirects` (Netlify) and `public/.htaccess` (Apache) are
   kept for other hosts and are inert here.
 
-The repo's Pages source must be set to **GitHub Actions**, not "Deploy from a
-branch", or the workflow uploads an artifact nothing serves.
+Two settings live in the repo UI, not in this codebase:
+
+- **Settings → Pages → Source** must be **GitHub Actions**, not "Deploy from a
+  branch", or the workflow uploads an artifact nothing serves.
+- **Settings → Pages → Custom domain** must say `jamesgathuru.me`. On a
+  branch deploy GitHub reads the CNAME file off the branch; on an Actions
+  deploy it does not, so the domain has to be set here or requests to it 404.
+  TLS is provisioned by GitHub a few minutes after it is set.
+
+### A lockfile trap worth remembering
+
+`npm ci` on the Linux runner once failed with `Missing: @emnapi/runtime from
+lock file`. npm filters the transitive dependencies of *optional* packages by
+the platform it resolves on, so a lockfile generated on Windows omits
+dependencies that only Linux needs — here, via `@img/sharp-wasm32` and
+`@rolldown/binding-wasm32-wasi`. Nothing local reproduces it, including
+`npm ci --os=linux`, which changes what installs rather than how the tree
+resolves. If it recurs, regenerate from an empty directory:
+
+```sh
+npm install --package-lock-only --os=linux --cpu=x64
+```
+
+Run it somewhere with no `node_modules`, or npm short-circuits and changes
+nothing.
 
 ## The project inventory
 
