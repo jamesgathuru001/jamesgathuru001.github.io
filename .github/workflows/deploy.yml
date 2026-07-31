@@ -52,8 +52,10 @@ jobs:
             echo "::group::npm ci output (tail)"
             tail -n 80 /tmp/npm-ci.log
             echo "::endgroup::"
-            grep -aE 'npm (error|ERR!|warn EBADENGINE)' /tmp/npm-ci.log \
-              | tail -n 25 \
+            # HEAD, not tail: npm states the cause first ("npm error code
+            # EUSAGE", then the reason) and dumps its full options list after.
+            # The previous run annotated the options dump and told us nothing.
+            head -n 30 /tmp/npm-ci.log \
               | while IFS= read -r line; do echo "::error::${line}"; done
             for f in "$HOME"/.npm/_logs/*-debug-0.log; do
               [ -f "$f" ] || continue
