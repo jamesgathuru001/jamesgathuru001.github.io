@@ -21,6 +21,19 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # Job-level, not step-level. `npm test` runs `npm run build` again through
+    # Playwright's webServer, and that rebuild is what ends up being uploaded —
+    # so the key has to be in scope for the test step too, or the deployed
+    # bundle carries whatever placeholder the test harness fell back to.
+    #
+    # Not a secret, and deliberately not stored as one: anything VITE_-prefixed
+    # is inlined into the client bundle, so this value is public the moment the
+    # site ships. `secrets` would only disguise that and add a setup step whose
+    # failure mode is a silently broken contact form. Web3Forms keys are meant
+    # to be public — the domain lock in their dashboard is what protects the
+    # inbox.
+    env:
+      VITE_WEB3FORMS_KEY: 9185cb01-cef3-4eb0-b70d-818c6bda640b
     steps:
       # v5 runs natively on Node 24; v4 targets Node 20 and the runner now
       # force-upgrades it with a deprecation warning.
@@ -69,16 +82,8 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      # Not a secret, and deliberately not stored as one. Anything VITE_-prefixed
-      # is inlined into the client bundle at build time, so this value is public
-      # the moment the site ships — putting it in `secrets` would only disguise
-      # that and add a setup step that, if forgotten, silently downgrades the
-      # contact form to a mailto link. Web3Forms keys are meant to be public;
-      # what protects the inbox is the domain lock in their dashboard.
       - name: Build
         run: npm run build
-        env:
-          VITE_WEB3FORMS_KEY: 9185cb01-cef3-4eb0-b70d-818c6bda640b
 
       # The suite drives the real production build — routing, the focus trap,
       # the layered Escape, the accent contrast. A red build should not deploy.
@@ -101,6 +106,14 @@ jobs:
           # it into the bundle.
           grep -rq "api.web3forms.com" dist/assets/*.js \
             || { echo "::error::contact form relay missing from the bundle — VITE_WEB3FORMS_KEY did not reach the build"; exit 1; }
+          # The endpoint being present proves nothing about the KEY. Web3Forms
+          # requires a UUID and rejects anything else at submit time, which is
+          # invisible until a visitor actually tries to send something — so
+          # assert the shape here, where it is still cheap to notice.
+          grep -rqE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' dist/assets/*.js \
+            || { echo "::error::no UUID access key in the bundle — the contact form would return 'Invalid access_key format'"; exit 1; }
+          grep -rq "test-access-key" dist/assets/*.js \
+            && { echo "::error::the test placeholder key reached dist/ — npm test rebuilt the deploy artifact"; exit 1; }
           # Without the prerendered files, /work and the case studies fall back
           # to 404.html: the app still boots, but the status is 404 and Google
           # drops the page. Silent, and invisible in any browser.
