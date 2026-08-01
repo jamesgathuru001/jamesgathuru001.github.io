@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures.js';
 
 /**
  * The Craft section claims "keyboard-complete by default" and invites reviewers

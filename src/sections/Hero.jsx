@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
-import { MapPin } from 'lucide-react';
+import { ArrowRight, MapPin } from 'lucide-react';
 import ParticleField from '../components/ParticleField/ParticleField';
-import Magnetic from '../components/Magnetic';
 import { site } from '../data/site';
 
 const rise = {
@@ -38,16 +37,15 @@ export default function Hero() {
         </motion.div>
 
         <motion.div className="hero__cta" variants={rise} initial="hidden" animate="show" custom={4}>
-          <Magnetic>
-            <a href="#work" className="btn btn--primary">
-              See the work
-            </a>
-          </Magnetic>
-          <Magnetic>
-            <a href={`mailto:${site.email}`} className="btn btn--ghost">
-              Hire me
-            </a>
-          </Magnetic>
+          <a href="#work" className="btn btn--primary">
+            See the work
+            <ArrowRight className="btn__icon" size={17} aria-hidden="true" />
+          </a>
+          {/* Was a mailto:. The form is on this page now — sending someone to a
+              blank compose window was the worse of the two asks. */}
+          <a href="#contact" className="btn btn--ghost">
+            Hire me
+          </a>
         </motion.div>
       </div>
 

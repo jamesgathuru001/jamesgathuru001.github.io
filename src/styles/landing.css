@@ -1193,3 +1193,103 @@
   font-size: var(--fs-xs);
   color: var(--text-3);
 }
+
+/* ── intro ──
+   Above the skip link (10000), because for the second or so it exists it IS
+   the page — anything peeking through would read as a rendering fault. */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  /* The same radial the Contact section uses, so the first thing on screen is
+     already the site's material rather than a flat holding colour. */
+  background-image: radial-gradient(80% 60% at 50% 42%, var(--accent-a08), transparent 70%);
+  will-change: transform;
+}
+.intro__body {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-5);
+}
+.intro__mark {
+  width: clamp(52px, 8vw, 68px);
+  height: auto;
+  /* A faint bloom under the stroke; the mark reads as lit rather than drawn on. */
+  filter: drop-shadow(0 0 24px rgba(90, 108, 255, 0.35));
+}
+.intro__meter {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-3);
+}
+.intro__rail {
+  width: clamp(140px, 22vw, 200px);
+  height: 2px;
+  border-radius: var(--r-full);
+  background: var(--line-2);
+  overflow: hidden;
+}
+.intro__fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--grad-accent);
+  /* scaleX is driven by the motion value — animating width would relayout the
+     rail on every frame. */
+  transform-origin: left center;
+}
+.intro__pct {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.18em;
+  color: var(--text-3);
+  /* Tabular figures: proportional digits make the counter jitter as it climbs
+     past each width change. */
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── intro portrait ──
+   The frame is fixed and the image inside it is clipped, so the reveal cannot
+   reflow anything around it — the rail and counter never move while it fills. */
+.intro__frame {
+  position: relative;
+  width: clamp(164px, 21vw, 236px);
+  aspect-ratio: 4 / 5;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  /* Holds the shape before a single pixel of the portrait has been revealed. */
+  background: var(--bg-1);
+  box-shadow: var(--card-shadow), var(--glass-inset);
+}
+.intro__portrait {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* clip-path and filter are both driven by the progress motion value. */
+  will-change: clip-path, filter;
+}
+/* The leading edge of the reveal. */
+.intro__scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--grad-accent);
+  box-shadow: 0 0 14px 1px var(--accent-a32);
+}
+
+/* Short viewports: the frame is the one element here that can afford to lose
+   height, and losing it beats scrolling a loading screen. */
+@media (max-height: 640px) {
+  .intro__frame {
+    width: clamp(120px, 16vw, 160px);
+  }
+  .intro__body {
+    gap: var(--sp-4);
+  }
+}

@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
-import Magnetic from '../components/Magnetic';
 import { lockScroll, unlockScroll } from '../lib/scrollLock';
 import { site, nav } from '../data/site';
 
@@ -117,13 +116,11 @@ export default function Nav() {
         </ul>
 
         <div className="nav__end">
-          <Magnetic>
-            {/* Was a mailto:. A form the visitor can fill in on the spot beats
-                handing their mail client a blank compose window. */}
-            <a href={href('#contact')} className="btn btn--primary nav__cta">
-              Hire me
-            </a>
-          </Magnetic>
+          {/* Was a mailto:. A form the visitor can fill in on the spot beats
+              handing their mail client a blank compose window. */}
+          <a href={href('#contact')} className="btn btn--primary nav__cta">
+            Hire me
+          </a>
 
           <button
             type="button"

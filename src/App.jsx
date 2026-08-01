@@ -1,5 +1,6 @@
 import { MotionConfig } from 'framer-motion';
 import useLenis from './hooks/useLenis';
+import Intro from './components/Intro';
 import ScrollProgress from './components/ScrollProgress';
 import Nav from './sections/Nav';
 import Hero from './sections/Hero';
@@ -20,6 +21,7 @@ export default function App() {
     // while keeping opacity fades — so the page still reads as designed rather
     // than as a stack of static blocks. PLAN §8.
     <MotionConfig reducedMotion="user">
+      <Intro />
       <a href="#main" className="skip-link">
         Skip to content
       </a>

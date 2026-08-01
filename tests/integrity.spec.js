@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures.js';
 import { shown, pending, countWord } from '../src/data/projects.js';
 
 const ROUTES = ['/', '/work', `/work/${shown[0].slug}`];

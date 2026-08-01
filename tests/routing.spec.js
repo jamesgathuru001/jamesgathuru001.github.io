@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures.js';
 import { nav } from '../src/data/site.js';
 
 test.describe('navigation', () => {
@@ -11,8 +11,9 @@ test.describe('navigation', () => {
 
     await page.locator('.work__more-link').click();
     await expect(page).toHaveURL(/\/work$/);
-    await page.waitForTimeout(400);
-    expect(await page.evaluate(() => window.scrollY)).toBeLessThan(10);
+    // Polled, not a fixed wait: the reset happens in a layout effect after
+    // Lenis is re-created, and a hardcoded 400ms is a race on a loaded machine.
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThan(10);
   });
 
   test('back button restores the previous scroll position', async ({ page }) => {
@@ -100,5 +101,41 @@ test.describe('mobile', () => {
     expect(
       await page.evaluate(() => getComputedStyle(document.documentElement).overflow)
     ).not.toBe('hidden');
+  });
+});
+
+test.describe('hero call to action', () => {
+  test('"Hire me" reaches the form, not a mail client', async ({ page }) => {
+    await page.goto('/');
+    const hire = page.locator('.hero__cta a', { hasText: 'Hire me' });
+    await expect(hire).toHaveAttribute('href', '#contact');
+    await hire.click();
+    await expect(page.locator('#contact .cform')).toBeInViewport();
+  });
+
+  test('the buttons do not chase the cursor', async ({ page }) => {
+    // Regression: the magnetic wrapper wrote a new transform on every
+    // pointermove while CSS eased transform over 420ms, so the button was
+    // permanently lagging a target that kept moving — it visibly wobbled.
+    // Hovering opposite ends of the same button must land on one transform.
+    await page.goto('/');
+    // The CTA row has its own entrance. Measuring mid-animation means the
+    // second hover lands where the button no longer is, which fails for a
+    // reason that has nothing to do with cursor chasing.
+    await expect
+      .poll(() => page.locator('.hero__cta').evaluate((el) => getComputedStyle(el).transform))
+      .toBe('none');
+
+    const btn = page.locator('.hero__cta .btn--primary');
+    const box = await btn.boundingBox();
+    const read = () => btn.evaluate((el) => getComputedStyle(el).transform);
+
+    await page.mouse.move(box.x + 6, box.y + box.height / 2);
+    await page.waitForTimeout(400);
+    const left = await read();
+
+    await page.mouse.move(box.x + box.width - 6, box.y + box.height / 2);
+    await page.waitForTimeout(400);
+    expect(await read()).toBe(left);
   });
 });

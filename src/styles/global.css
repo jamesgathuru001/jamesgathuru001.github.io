@@ -259,12 +259,6 @@ ul {
   top: var(--sp-4);
 }
 
-.magnetic {
-  display: inline-flex;
-  transition: transform var(--d-el) var(--ease);
-  will-change: transform;
-}
-
 /* ── buttons ──
    Both variants share one silhouette so they read as a pair: same height, same
    radius, same optical padding. Only the surface differs. */
@@ -290,8 +284,20 @@ ul {
     border-color var(--d-micro) var(--ease),
     color var(--d-micro) var(--ease);
 }
+/* Scale, not a 1px nudge: a button that shrinks under the finger reads as
+   pressed, where a downward shift reads as the layout moving. Scale also
+   cannot reflow anything around it. */
 .btn:active {
-  transform: translateY(1px);
+  transform: scale(0.976);
+}
+/* Slides on hover, so the arrow reads as the direction of travel rather than
+   as decoration bolted to the label. */
+.btn__icon {
+  flex: none;
+  transition: transform var(--d-micro) var(--ease);
+}
+.btn:hover .btn__icon {
+  transform: translateX(3px);
 }
 
 .btn--primary {
@@ -299,18 +305,29 @@ ul {
      physical surface rather than a flat swatch. */
   background: linear-gradient(180deg, var(--accent-bright), var(--accent-deep));
   color: var(--accent-ink);
+  /* A hairline of its own colour. Without it the fill bleeds into the page at
+     the edges and the pill loses its shape against a near-black background. */
+  border-color: rgba(255, 255, 255, 0.16);
+  /* Four layers doing four jobs: lit top edge, grounded bottom edge, a tight
+     contact shadow that sets it on the surface, and a wide accent bloom. The
+     single soft glow this replaces had no contact shadow, so the button
+     appeared to hover an inch above the page rather than rest on it. */
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    0 10px 24px -10px rgba(67, 97, 255, 0.75);
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -1px 0 rgba(8, 12, 40, 0.24),
+    0 1px 2px rgba(6, 9, 30, 0.6),
+    0 10px 26px -12px rgba(67, 97, 255, 0.62);
 }
 .btn--primary:hover {
   transform: translateY(-2px);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.36),
-    0 16px 34px -12px rgba(67, 97, 255, 0.9);
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 0 rgba(8, 12, 40, 0.24),
+    0 2px 4px rgba(6, 9, 30, 0.5),
+    0 18px 38px -14px rgba(67, 97, 255, 0.78);
 }
 .btn--primary:active {
-  transform: translateY(0);
+  transform: translateY(-1px) scale(0.976);
 }
 /* Sheen sweep on hover. Sits above the fill; alpha kept low so it reads as
    light crossing the surface rather than a white bar over the label. */
@@ -331,10 +348,15 @@ ul {
 .btn--ghost {
   /* Glass, not a bare outline — an accent-coloured border on hover was reading
      as a stuck focus ring next to the filled button. */
-  background: var(--glass), rgba(255, 255, 255, 0.02);
+  background: var(--glass), rgba(255, 255, 255, 0.025);
   border-color: var(--line-2);
   color: var(--text);
-  box-shadow: var(--glass-inset);
+  /* Matches the primary's contact shadow so the pair sit on the same plane;
+     without it the ghost read as a hole cut in the page next to a raised
+     button. */
+  box-shadow:
+    var(--glass-inset),
+    0 1px 2px rgba(6, 9, 30, 0.5);
 }
 .btn--ghost:hover {
   transform: translateY(-2px);
@@ -342,10 +364,11 @@ ul {
   background: var(--glass), var(--accent-a08);
   box-shadow:
     var(--glass-inset),
-    0 12px 28px -14px rgba(0, 0, 0, 0.8);
+    0 2px 4px rgba(6, 9, 30, 0.45),
+    0 14px 30px -16px rgba(0, 0, 0, 0.85);
 }
 .btn--ghost:active {
-  transform: translateY(0);
+  transform: translateY(-1px) scale(0.976);
 }
 
 /* Link underline sweep (PLAN §8 micro-interactions) */
