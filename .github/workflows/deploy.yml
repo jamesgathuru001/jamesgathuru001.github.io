@@ -101,6 +101,13 @@ jobs:
           # it into the bundle.
           grep -rq "api.web3forms.com" dist/assets/*.js \
             || { echo "::error::contact form relay missing from the bundle — VITE_WEB3FORMS_KEY did not reach the build"; exit 1; }
+          # Without the prerendered files, /work and the case studies fall back
+          # to 404.html: the app still boots, but the status is 404 and Google
+          # drops the page. Silent, and invisible in any browser.
+          for f in sitemap.xml robots.txt og.png work.html; do
+            test -f "dist/$f" || { echo "::error::dist/$f missing — SEO prerender did not run"; exit 1; }
+          done
+          echo "prerendered: $(find dist -name '*.html' -not -name '404.html' | wc -l) pages"
 
       - uses: actions/configure-pages@v5
 

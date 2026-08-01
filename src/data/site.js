@@ -1,6 +1,9 @@
 export const site = {
   name: 'James Gathuru',
   initials: 'JG',
+  // Absolute, no trailing slash. Canonicals, OG tags and the sitemap are all
+  // built from this, so the deployed domain lives in exactly one place.
+  url: 'https://jamesgathuru.me',
   role: 'Frontend Engineer',
   specialism: 'React',
   location: 'Nairobi, Kenya',

@@ -190,3 +190,108 @@ test.describe('build output', () => {
     expect(scripts.some((s) => /PerfDemo/.test(s))).toBe(true);
   });
 });
+
+test.describe('seo', () => {
+  // Everything here reads the RAW response, never the rendered DOM. A social
+  // scraper does not run JS, so `document.title` proves nothing to it — the
+  // only question that matters is what comes back over the wire.
+  // index.html wraps its long meta tags across lines; the prerendered files
+  // emit them on one. Match either, or the homepage silently reads as empty.
+  const meta = (html, attr, key) => {
+    const m = html.match(new RegExp(`${attr}="${key}"[\\s\\S]*?content="([^"]*)"`));
+    return m ? m[1] : '';
+  };
+
+  const SEO_ROUTES = ['/', '/work', ...shown.map((p) => `/work/${p.slug}`)];
+
+  test('every route serves its own title, canonical and og:url in the raw HTML', async ({
+    request,
+  }) => {
+    const titles = new Set();
+
+    for (const route of SEO_ROUTES) {
+      const res = await request.get(route);
+      expect(res.status(), `${route} must not be a 404 — Google drops those`).toBe(200);
+      const html = await res.text();
+
+      const title = (html.match(/<title>([^<]*)<\/title>/) || ['', ''])[1];
+      const canonical = (html.match(/rel="canonical" href="([^"]*)"/) || ['', ''])[1];
+      const ogUrl = meta(html, 'property', 'og:url');
+      const desc = meta(html, 'name', 'description');
+
+      expect(title, `${route} has no title`).toBeTruthy();
+      expect(desc, `${route} has no description`).toBeTruthy();
+      expect(canonical, `${route} canonical is wrong`).toBe(
+        `https://jamesgathuru.me${route === '/' ? '/' : route}`
+      );
+      expect(ogUrl, `${route} og:url should match canonical`).toBe(canonical);
+
+      // The bug this whole prerender exists to prevent: one shared title
+      // across every route, so every link previews as the landing page.
+      expect(titles.has(title), `${route} reuses another route's title`).toBe(false);
+      titles.add(title);
+    }
+  });
+
+  test('each page carries exactly one JSON-LD graph, and it parses', async ({ request }) => {
+    for (const route of SEO_ROUTES) {
+      const html = await (await request.get(route)).text();
+      const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
+      expect(blocks, `${route} should have one ld+json block`).toHaveLength(1);
+      // Two graphs on one page is how contradictory structured data ships.
+      expect(() => JSON.parse(blocks[0][1]), `${route} ld+json is malformed`).not.toThrow();
+    }
+  });
+
+  test('case studies describe themselves, not the site', async ({ request }) => {
+    const p = shown[0];
+    const html = await (await request.get(`/work/${p.slug}`)).text();
+    expect(html).toContain(`<title>${p.title} — ${p.subtitle} | James Gathuru</title>`);
+
+    const ld = JSON.parse(
+      html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]
+    );
+    const types = ld['@graph'].map((n) => n['@type']);
+    expect(types).toContain('CreativeWork');
+    expect(types).toContain('BreadcrumbList');
+  });
+
+  test('the share image is absolute and actually exists', async ({ request }) => {
+    // A relative og:image silently resolves to nothing on every scraper.
+    const html = await (await request.get('/')).text();
+    const img = meta(html, 'property', 'og:image');
+    expect(img).toBe('https://jamesgathuru.me/og.png');
+
+    const res = await request.get('/og.png');
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type']).toContain('png');
+  });
+
+  test('robots.txt and sitemap.xml ship, and the sitemap is complete', async ({ request }) => {
+    const robots = await request.get('/robots.txt');
+    expect(robots.status()).toBe(200);
+    expect(await robots.text()).toContain('Sitemap: https://jamesgathuru.me/sitemap.xml');
+
+    const res = await request.get('/sitemap.xml');
+    expect(res.status()).toBe(200);
+    const xml = await res.text();
+    for (const route of SEO_ROUTES) {
+      expect(xml, `${route} is missing from the sitemap`).toContain(
+        `<loc>https://jamesgathuru.me${route === '/' ? '/' : route}</loc>`
+      );
+    }
+    // Unverified projects have no page, so they must not be advertised either.
+    for (const p of pending) expect(xml).not.toContain(p.slug);
+  });
+
+  test('the icons resolve', async ({ request }) => {
+    for (const [file, type] of [
+      ['/favicon.svg', 'svg'],
+      ['/apple-touch-icon.png', 'png'],
+    ]) {
+      const res = await request.get(file);
+      expect(res.status(), `${file} is missing`).toBe(200);
+      expect(res.headers()['content-type']).toContain(type);
+    }
+  });
+});

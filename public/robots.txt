@@ -1,0 +1,6 @@
+# Everything here is public work. Nothing to hide from a crawler, and blocking
+# assets would only stop Google rendering the page it is trying to index.
+User-agent: *
+Allow: /
+
+Sitemap: https://jamesgathuru.me/sitemap.xml

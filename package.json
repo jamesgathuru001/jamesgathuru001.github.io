@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/spa-fallback.mjs",
+    "build": "vite build && node scripts/spa-fallback.mjs && node scripts/seo.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
     "shoot": "node scripts/shoot.mjs",
     "assets": "node scripts/optimize.mjs",
     "icons": "node scripts/icons.mjs",
+    "og": "node scripts/og.mjs",
     "fonts": "node scripts/fonts.mjs",
     "test": "playwright test"
   },

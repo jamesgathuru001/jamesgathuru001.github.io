@@ -15,13 +15,33 @@
       content="James Gathuru is a frontend engineer in Nairobi specializing in React. Frontend lead on production platforms across fintech, mobility and community."
     />
 
+    <!-- These are the landing page's values AND the template the prerender
+         rewrites per route (scripts/seo.mjs matches each tag by its unique
+         attribute and swaps the whole tag). Keep the attribute names stable. -->
+    <link rel="canonical" href="https://jamesgathuru.me/" />
+
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="James Gathuru" />
+    <meta property="og:url" content="https://jamesgathuru.me/" />
     <meta property="og:title" content="James Gathuru — Frontend Engineer (React)" />
     <meta
       property="og:description"
       content="Frontend engineer in Nairobi specializing in React. I build interfaces that feel inevitable."
     />
+    <!-- Absolute, and PNG: scrapers do not resolve relative URLs, and several
+         still refuse WebP. Regenerate with `npm run og`. -->
+    <meta property="og:image" content="https://jamesgathuru.me/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="James Gathuru — I build interfaces that feel inevitable." />
+
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="James Gathuru — Frontend Engineer (React)" />
+    <meta
+      name="twitter:description"
+      content="Frontend engineer in Nairobi specializing in React. I build interfaces that feel inevitable."
+    />
+    <meta name="twitter:image" content="https://jamesgathuru.me/og.png" />
 
     <!-- Self-hosted (PLAN §9) — regenerate with `npm run fonts`. No third-party
          connection on the critical path. The two families that render above the
@@ -35,17 +55,36 @@
     />
     <link rel="preload" href="/fonts/inter-300-700-latin.woff2" as="font" type="font/woff2" crossorigin />
 
+    <!-- Site-wide graph. scripts/seo.mjs replaces this whole block on deeper
+         routes so each page carries exactly one correct set. -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "James Gathuru",
-        "jobTitle": "Frontend Engineer",
-        "email": "jamesgathuru001@gmail.com",
-        "url": "https://jamesgathuru.dev",
-        "sameAs": ["https://www.linkedin.com/in/james-gathuru/"],
-        "address": { "@type": "PostalAddress", "addressLocality": "Nairobi", "addressCountry": "KE" },
-        "knowsAbout": ["React", "TypeScript", "Frontend Engineering", "Web Animation"]
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://jamesgathuru.me/#person",
+            "name": "James Gathuru",
+            "jobTitle": "Frontend Engineer",
+            "email": "jamesgathuru001@gmail.com",
+            "url": "https://jamesgathuru.me",
+            "image": "https://jamesgathuru.me/og.png",
+            "sameAs": ["https://www.linkedin.com/in/james-gathuru/"],
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Nairobi",
+              "addressCountry": "KE"
+            },
+            "knowsAbout": ["React", "TypeScript", "Frontend Engineering", "Web Animation"]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://jamesgathuru.me/#website",
+            "url": "https://jamesgathuru.me",
+            "name": "James Gathuru",
+            "publisher": { "@id": "https://jamesgathuru.me/#person" }
+          }
+        ]
       }
     </script>
   </head>
