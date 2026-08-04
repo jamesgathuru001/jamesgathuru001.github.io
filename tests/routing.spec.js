@@ -68,6 +68,24 @@ test.describe('case studies', () => {
     }
   });
 
+  test('the full-page shot scrolls itself, not the page behind it', async ({ page }) => {
+    // Regression: Lenis preventDefaults wheel at the window, so wheeling over
+    // the capped frame scrolled the page straight past it and the frame never
+    // moved. data-lenis-prevent hands wheel events inside it back to the browser.
+    await page.goto('/work/ndai');
+    const frame = page.locator('.cs__long-frame');
+    await frame.scrollIntoViewIfNeeded();
+    await expect(frame).toBeVisible();
+
+    const pageBefore = await page.evaluate(() => window.scrollY);
+    await frame.hover();
+    await page.mouse.wheel(0, 400);
+    await expect.poll(() => frame.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
+    // The page may drift a little on momentum, but it must not run away.
+    const drift = Math.abs((await page.evaluate(() => window.scrollY)) - pageBefore);
+    expect(drift).toBeLessThan(100);
+  });
+
   test('unknown and unverified slugs redirect to the index', async ({ page }) => {
     // studioos is deliberately `verified: false` — no confirmed role, so it must
     // not be reachable, not even by typing the URL.

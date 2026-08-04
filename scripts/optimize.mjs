@@ -24,8 +24,11 @@ for (const slug of slugs) {
     const before = fs.statSync(src).size;
     const meta = await sharp(src).metadata();
 
-    // hero → card widths; full → single long shot for case study
-    const widths = kind === 'hero' ? [1600, 1200, 800, 400] : [1400];
+    // hero → card widths; full → single long shot for case study.
+    // 1280 matches the capture viewport: the long shot is taken at CSS scale to
+    // dodge Chromium's fullPage height ceiling, so there is no 1400 to resize
+    // down from and asking for one would skip the asset entirely.
+    const widths = kind === 'hero' ? [1600, 1200, 800, 400] : [1280];
     for (const w of widths) {
       if (w > meta.width) continue;
       const base = kind === 'hero' ? `${OUT}/${slug}-${w}` : `${OUT}/${slug}-full`;

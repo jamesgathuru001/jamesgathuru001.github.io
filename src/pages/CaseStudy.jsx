@@ -161,7 +161,11 @@ export default function CaseStudy() {
             <div className="container">
               <Reveal>
                 <p className="cs__long-key">The full page</p>
-                <div className="cs__long-frame">
+                {/* data-lenis-prevent: Lenis calls preventDefault on wheel at the
+                    window, so without this the page scrolls past a frame the
+                    visitor is trying to scroll through. overscroll-behavior
+                    still hands the page back at either end. */}
+                <div className="cs__long-frame" data-lenis-prevent>
                   <picture>
                     <source type="image/avif" srcSet={`/assets/work/${p.slug}-full.avif`} />
                     <img

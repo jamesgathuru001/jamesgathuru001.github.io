@@ -57,8 +57,56 @@ for (const s of targets) {
     });
     await page.screenshot({ path: `${OUT}${s.slug}-hero.png` });
     rec.hero = true;
-    // full page for the case-study long shot
-    await page.screenshot({ path: `${OUT}${s.slug}-full.png`, fullPage: true });
+
+    // Walk the page before the full shot. Chromium captures fullPage by
+    // expanding the capture region, never by scrolling, so IntersectionObserver
+    // never fires and loading="lazy" images never request. On sites built
+    // around scroll reveals — ndai, algora, studioos — everything below the
+    // fold otherwise captures as empty boxes on a blank background.
+    // Every wait below is bounded. A capture script that hangs on one site
+    // blocks the whole run, and these are other people's pages: lazy sentinels
+    // that keep extending the document and images that never settle are both
+    // things they are entitled to do.
+    await page.evaluate(async () => {
+      const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      const step = Math.round(window.innerHeight * 0.75);
+      const deadline = Date.now() + 45000;
+      let y = 0;
+      // scrollHeight grows as reveals land, so re-read it every pass rather
+      // than caching a height that was only true at the top.
+      while (y < document.documentElement.scrollHeight && Date.now() < deadline) {
+        window.scrollTo(0, y);
+        await wait(250);
+        y += step;
+      }
+      window.scrollTo(0, document.documentElement.scrollHeight);
+      await wait(800);
+      window.scrollTo(0, 0);
+      await wait(400);
+    });
+    // Anything the walk kicked off still has to arrive and decode. A request
+    // that stalls fires neither load nor error, so race the lot against a cap.
+    await page.evaluate(
+      () =>
+        Promise.race([
+          Promise.all(
+            Array.from(document.images)
+              .filter((img) => !img.complete)
+              .map((img) => new Promise((r) => { img.onload = img.onerror = r; })),
+          ),
+          new Promise((r) => setTimeout(r, 15000)),
+        ]),
+    );
+    await page.waitForTimeout(1200);
+    rec.height = await page.evaluate(() => document.documentElement.scrollHeight);
+
+    // Full page for the case-study long shot, at CSS resolution rather than the
+    // context's 2x. Chromium stops painting a fullPage capture somewhere around
+    // 16,000 device pixels tall: at 2x that is only ~8,000 CSS px, and the
+    // tallest sites here (ndai ~9,900, atom ~9,300) lost everything past it to
+    // flat background. scale:'css' keeps the whole page. The long shot is
+    // downscaled for shipping anyway, so 1x costs nothing visible.
+    await page.screenshot({ path: `${OUT}${s.slug}-full.png`, fullPage: true, scale: 'css' });
     rec.full = true;
   } catch (e) {
     rec.error = String(e).split('\n')[0].slice(0, 120);
