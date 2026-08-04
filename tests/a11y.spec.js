@@ -119,14 +119,22 @@ test.describe('contact', () => {
     await expect(page.locator('#contact .cform')).toBeVisible();
   });
 
-  test('the footer carries phone and LinkedIn, and never a raw address', async ({ page }) => {
+  test('the contact section carries phone and LinkedIn', async ({ page }) => {
+    // These used to be duplicated in the footer. One copy, beside the form,
+    // where someone deciding how to reach out is already looking.
+    await page.goto('/');
+    await page.locator('#contact').scrollIntoViewIfNeeded();
+    await expect(page.locator('#contact a[href^="tel:"]')).toBeVisible();
+    await expect(page.locator('#contact a[href*="linkedin.com"]')).toBeVisible();
+  });
+
+  test('no raw address is printed anywhere', async ({ page }) => {
     // The address is deliberately unprinted: the form reaches the same inbox,
-    // and a mailto in the DOM of every page is free food for scrapers.
+    // and a mailto in the DOM of every page is free food for scrapers. The only
+    // mailto in the codebase is the fallback shown after a send actually fails.
     for (const route of ['/', '/work']) {
       await page.goto(route);
-      await expect(page.locator('footer a[href^="tel:"]')).toBeVisible();
-      await expect(page.locator('footer a[href*="linkedin.com"]')).toBeVisible();
-      await expect(page.locator('footer a[href^="mailto:"]')).toHaveCount(0);
+      await expect(page.locator('a[href^="mailto:"]')).toHaveCount(0);
     }
   });
 });
