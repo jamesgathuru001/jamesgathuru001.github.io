@@ -1083,17 +1083,6 @@
   }
 }
 
-/* ── footer contact ──
-   Phone and LinkedIn only. The address itself is deliberately not printed
-   anywhere — /contact takes messages to the same inbox through the form.
-   A modifier on .ccards, so the card styling stays in one place. */
-.fcontact {
-  max-width: 720px;
-  padding-bottom: var(--sp-7);
-  margin-bottom: var(--sp-7);
-  border-bottom: 1px solid var(--line);
-}
-
 .ccards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

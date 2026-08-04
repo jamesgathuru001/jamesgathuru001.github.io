@@ -4,7 +4,6 @@ import { ArrowUpRight } from 'lucide-react';
 import Reveal from '../components/Reveal';
 import Modal from '../components/Modal';
 import ContactPanel from '../components/ContactPanel';
-import ContactDetails from '../components/ContactDetails';
 import useLocalTime from '../hooks/useLocalTime';
 import { site } from '../data/site';
 import { stack, craft } from '../data/stack';
@@ -253,7 +252,6 @@ export function Footer() {
   return (
     <footer className="footer">
       <div className="container">
-        <ContactDetails />
         <div className="footer__inner">
           <div>
             <p className="footer__mark">{site.initials}</p>
